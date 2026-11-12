@@ -8,8 +8,6 @@ import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collector;
-import java.util.stream.Collectors;
 
 import javax.swing.JButton;
 import javax.swing.JPanel;
@@ -194,30 +192,20 @@ public class SimulationPanel extends JPanel implements ActionListener {
     }
 
     public int[] countByType() {
-        //int neutral = 0, infected = 0, antivirus = 0;
-
         // Use parallel stream to count all states of cells and put into a int array
-        int[] listOfCounts = cells.parallelStream()
-            .collect(Collectors.groupingBy( // collect and group by cell state
-                cell -> cell.getState(), 
-                Collectors.counting())) // count number of cells with each state
-            .values() // get values in map
-            .stream() // convert collection to stream
-            .mapToInt(Long::intValue) // convert result values from long to int
-            .toArray();
+        int neutral = (int) cells.parallelStream()
+            .filter(cell -> cell.getState() == NeutralState.INSTANCE)
+            .count();
 
-        return listOfCounts;
+        int infected = (int) cells.parallelStream()
+            .filter(cell -> cell.getState() == InfectedState.INSTANCE)
+            .count();
 
-        /* for (Cell c : cells) {
-            if (c.getState() == NeutralState.INSTANCE)
-                neutral++;
-            if (c.getState() == InfectedState.INSTANCE)
-                infected++;
-            if (c.getState() == AntivirusState.INSTANCE)
-                antivirus++;
-        }
+        int antivirus = (int) cells.parallelStream()
+            .filter(cell -> cell.getState() == AntivirusState.INSTANCE)
+            .count();
 
-        return new int[] { neutral, infected, antivirus }; */
+        return new int[] { neutral, infected, antivirus };
     }
 
     public void EnterBerserk() {
@@ -293,6 +281,7 @@ public class SimulationPanel extends JPanel implements ActionListener {
         // Move each cell.
         for (Cell cell : cells) {
             cell.move(simScreenX, simScreenY, offset, offset);
+            cell.immunity.decay(deltaTime);
         }
         // Check cell collisions.
         for (int i = 0; i < cells.size(); i++) {

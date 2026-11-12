@@ -16,6 +16,7 @@ public class SeasonManager {
     private final SimulationPanel simulationPanel;
     private final Random random = new Random();
 
+    private SeasonEffect seasonEffect;
     private Season currentSeason;
     private boolean enabled = true;
 
@@ -24,13 +25,19 @@ public class SeasonManager {
 
     private int seasonLengthSeconds;
 
-
     public SeasonManager(SimulationPanel simulationPanel) {
 
         this.simulationPanel = simulationPanel;
-        currentSeason = Season.values()[
+        Season randomSeason = Season.values()[
             random.nextInt(Season.values().length)
         ];
+        currentSeason = randomSeason;
+
+        if (currentSeason == Season.WINTER) {
+            seasonEffect = new WinterEffect(random, simulationPanel);
+        } else if (currentSeason == Season.SPRING) {
+            seasonEffect = new SpringEffect(random, simulationPanel);
+        }
 
         // Choose a random season length between 5 and 10 seconds.
         seasonLengthSeconds = random.nextInt(6) + 5;
@@ -52,7 +59,6 @@ public class SeasonManager {
         // Apply temporary speed and size modifiers.
         updateCellModifiers(cells);
 
-
         // Apply effects once every second.
         while (effectTimer >= 1000) {
 
@@ -73,10 +79,12 @@ public class SeasonManager {
     private void changeSeason(List<Cell> cells) {
 
         // Move to the next season.
+        
         switch (currentSeason) {
 
             case WINTER:
                 currentSeason = Season.SPRING;
+                seasonEffect = new SpringEffect(random, simulationPanel);
                 break;
 
             case SPRING:
@@ -89,6 +97,7 @@ public class SeasonManager {
 
             case AUTUMN:
                 currentSeason = Season.WINTER;
+                seasonEffect = new WinterEffect(random, simulationPanel);
                 break;
         }
 
@@ -109,81 +118,15 @@ public class SeasonManager {
         updateCellModifiers(cells);
     }
 
-
+    // Apply season effects for winter and spring
     private void applySeasonEffect(List<Cell> cells) {
-
-        switch (currentSeason) {
-
-            case WINTER:
-                winterEffect(cells);
-                break;
-
-            case SPRING:
-                springEffect(cells);
-                break;
-
-            case SUMMER:
-                // Summer has no once-per-second effect.
-                break;
-
-            case AUTUMN:
-                // Autumn has no once-per-second effect.
-                break;
+        if (currentSeason == Season.WINTER || currentSeason == Season.SPRING) {
+            seasonEffect.applyEffect(cells);
         }
     }
 
-
-    private void winterEffect(List<Cell> cells) {
-
-        Iterator<Cell> iterator = cells.iterator();
-
-        while (iterator.hasNext()) {
-
-            iterator.next();
-
-            // 2% chance for this cell to die.
-            if (random.nextDouble() < 0.03) {
-
-                iterator.remove();
-
-                simulationPanel.incrementDeadCellCount();
-            }
-        }
-    }
-
-
-    private void springEffect(List<Cell> cells) {
-
-        List<Cell> newCells = new ArrayList<>();
-
-        cells.stream()
-            // Only neutral cells can reproduce. 10% chance for this cell to reproduce.
-            .filter(cell -> cell.getState().equals(NeutralState.INSTANCE) && random.nextDouble() < 0.10)
-            .forEach(cell -> {
-                double newX = cell.getX() + (random.nextDouble() * 10 - 5);
-                double newY = cell.getY() + (random.nextDouble() * 10 - 5);
-
-                newCells.add(
-                    new Cell(
-                        newX,
-                        newY,
-                        cells.size() + newCells.size(),
-                        NeutralState.INSTANCE
-                    )
-                );
-
-                simulationPanel.incrementDuplicateCellCount();
-            }
-        );
-
-        // Add all new cells after the loop has finished.
-        cells.addAll(newCells);
-
-    }
-
-
+    // Apply summer and autumn cell modifiers
     private void updateCellModifiers(List<Cell> cells) {
-        
 
         for (Cell cell : cells) {
 
@@ -272,6 +215,7 @@ public class SeasonManager {
     public void reset() {
 
         currentSeason = Season.SPRING;
+        seasonEffect = new SpringEffect(random, simulationPanel);
 
         seasonTimer = 0;
         effectTimer = 0;

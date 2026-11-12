@@ -243,6 +243,7 @@ public class Cell {
 
             // == Start Cell Immunity ==
             // If neutral cell converted to antivirus, remove immunity
+            /* 
             if (this.state == NeutralState.INSTANCE && thisNewState == AntivirusState.INSTANCE) {
                 if (this.immunity.getImmunity() == true) {
                     this.immunity.setImmunity(false);
@@ -253,20 +254,22 @@ public class Cell {
                 if (opponent.immunity.getImmunity() == true) {
                     opponent.immunity.setImmunity(false);
                 }
-            }
+            } */
 
             // ---------------------------------Check cell immunity----------------------------------
-            // Check if cell is immune and change it back to neutral if so
+            // Check if cell is immune and change it back to neutral if so (this is neutral cell immunity)
             if (this.state == NeutralState.INSTANCE && thisNewState == InfectedState.INSTANCE) {
                 if (this.immunity.getImmunityAllowed()) {
 
-                    boolean calculatedImmunity = this.immunity.calculateIfImmune();
-                    if (this.immunity.getImmunity() == false && calculatedImmunity) {
-                        this.immunity.checkIfImmune();
+                    // first calculation for if cell should be immune
+                    boolean isImmune = this.immunity.calculateIfImmune();
+                    // if cell is not currently immune but calculation says it is then call function to make apply immunity
+                    if (this.immunity.getImmunity() == false && isImmune) {
+                        this.immunity.updateImmunity();
                         thisNewState = NeutralState.INSTANCE;
                         // System.out.println("Immune");
-                    } else if (opponent.immunity.getImmunity() == true) {
-                        this.immunity.checkIfImmune();
+                    } else if (this.immunity.getImmunity() == true) {
+                        this.immunity.updateImmunity();
                         thisNewState = NeutralState.INSTANCE;
                         // System.out.println("Immune"); // For debugging
                     } else {
@@ -280,14 +283,14 @@ public class Cell {
             if (opponent.state == NeutralState.INSTANCE && oppNewState == InfectedState.INSTANCE) {
                 if (opponent.immunity.getImmunityAllowed()) {
                     // System.out.println("opp Immunity: "+ (this.immunity.getImmunity() == false));
-                    boolean calculatedImmunity = opponent.immunity.calculateIfImmune();
-                    if (opponent.immunity.getImmunity() == false && calculatedImmunity) {
-                        opponent.immunity.checkIfImmune();
+                    boolean isImmune = opponent.immunity.calculateIfImmune();
+                    if (opponent.immunity.getImmunity() == false && isImmune) {
+                        opponent.immunity.updateImmunity();
                         oppNewState = NeutralState.INSTANCE;
                         // System.out.println("Immune");
 
                     } else if (opponent.immunity.getImmunity() == true) {
-                        opponent.immunity.checkIfImmune();
+                        opponent.immunity.updateImmunity();
                         oppNewState = NeutralState.INSTANCE;
                         // System.out.println("Immune");
                     } else {

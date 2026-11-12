@@ -1,5 +1,4 @@
 
-
 public class SimulationStats {
     private final int neutralCount;
     private final int infectedCount;
