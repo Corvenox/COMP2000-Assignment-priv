@@ -242,20 +242,6 @@ public class Cell {
             // === End resistance check ===
 
             // == Start Cell Immunity ==
-            // If neutral cell converted to antivirus, remove immunity
-            /* 
-            if (this.state == NeutralState.INSTANCE && thisNewState == AntivirusState.INSTANCE) {
-                if (this.immunity.getImmunity() == true) {
-                    this.immunity.setImmunity(false);
-                }
-            }
-
-            if (opponent.state == NeutralState.INSTANCE && oppNewState == AntivirusState.INSTANCE) {
-                if (opponent.immunity.getImmunity() == true) {
-                    opponent.immunity.setImmunity(false);
-                }
-            } */
-
             // ---------------------------------Check cell immunity----------------------------------
             // Check if cell is immune and change it back to neutral if so (this is neutral cell immunity)
             if (this.state == NeutralState.INSTANCE && thisNewState == InfectedState.INSTANCE) {
