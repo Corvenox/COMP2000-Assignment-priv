@@ -224,12 +224,6 @@ public class SimulationPanel extends JPanel implements ActionListener {
             
                 // Make infected cells berserk
                 cells.stream().filter(cell -> cell.getState() == InfectedState.INSTANCE).map(cell -> cell.isBerserk = true).toList();
-
-                /* for (Cell c : cells) {
-                    if (c.getState() == InfectedState.INSTANCE) {
-                        c.isBerserk = true;
-                    }
-                } */
                 
             }
         } 
@@ -301,6 +295,7 @@ public class SimulationPanel extends JPanel implements ActionListener {
         // Update the season system.
         seasonManager.update(cells, deltaTime);
 
+        // Identify cells to remove
         List<Cell> toRemove = cells.stream()
         .filter(cell -> Math.random() < 0.0001)
         .toList();
@@ -310,17 +305,6 @@ public class SimulationPanel extends JPanel implements ActionListener {
             .filter(c -> (c.getState() == InfectedState.INSTANCE || c.getState() == AntivirusState.INSTANCE) && Math.random() < 0.0002)
             .map(c -> new Cell(c.getX(), c.getY(), cells.size(), c.getState(), Color.ORANGE, true))
             .toList();
-        
-        /*
-        for (Cell c : cells) {
-            if (Math.random() < 0.0001) {
-                toRemove.add(c);
-            }
-            if ((c.getState() == InfectedState.INSTANCE || c.getState() == AntivirusState.INSTANCE)
-                    && Math.random() < 0.0002) {
-                toAdd.add(new Cell(c.getX(), c.getY(), cells.size(), c.getState(), Color.ORANGE, true));
-            }
-        } */
 
         cells.removeAll(toRemove);
         deadCellCount += toRemove.size();

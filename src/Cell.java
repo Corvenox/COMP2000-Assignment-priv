@@ -247,9 +247,9 @@ public class Cell {
             if (this.state == NeutralState.INSTANCE && thisNewState == InfectedState.INSTANCE) {
                 if (this.immunity.getImmunityAllowed()) {
 
-                    // first calculation for if cell should be immune
+                    // First calculation for if cell should be immune
                     boolean isImmune = this.immunity.calculateIfImmune();
-                    // if cell is not currently immune but calculation says it is then call function to make apply immunity
+                    // If cell is not currently immune but calculation says it is then call function to make apply immunity
                     if (this.immunity.getImmunity() == false && isImmune) {
                         this.immunity.updateImmunity();
                         thisNewState = NeutralState.INSTANCE;

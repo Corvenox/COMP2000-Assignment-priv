@@ -57,11 +57,9 @@ public class CellImmunity {
         if (hasImmunity) {
             immunityTimer += deltaTime;
 
-            // Make a timer and decrement immmunity strength by 10 approximately every 500 miliseconds
+            // Make a timer and decrement immmunity strength by 9 approximately every 500 miliseconds
             while (immunityTimer >= 500) {
                 immunityTimer -= 500;
-
-                //System.out.println("strength: " + currImmunityStrength);
 
                 if (currImmunityStrength > 0) {
                     currImmunityStrength -= 9;
